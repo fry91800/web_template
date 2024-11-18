@@ -5,6 +5,8 @@
     "moduleResolution": "node",
     "jsx": "preserve",
     "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,  // This is necessary for using decorators
+    "emitDecoratorMetadata": true,  // Ensures that metadata required by Sequelize
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true,
