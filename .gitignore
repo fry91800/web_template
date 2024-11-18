@@ -1,0 +1,6 @@
+**/node_modules/
+**/.next/
+server/.env.dev
+server/.env.prod
+**/tsconfig.tsbuildinfo
+**/dist
