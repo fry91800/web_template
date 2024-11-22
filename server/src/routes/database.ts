@@ -5,7 +5,7 @@ import sequelize from '../database/database';
 import logger from '../config/logger';
 import * as databaseService from '../services/databaseService';
 const router = Router();
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (req: express.Request, res: express.Response) => {
   try {
     const databaseInfo: Database = await databaseService.getDatabaseInfo();
     const response = {

@@ -5,11 +5,14 @@ import express, { Request, Response, Application } from 'express';
 import logger from './config/logger';
 import sequelize from './database/database';
 import { User } from './database/models/User';
+import databaseRouter from './routes/database';
+import authRouter from './routes/authRoutes';
+import protectedRouter from './routes/protectedRoute';
 
 const app: Application = express();
 
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true }));
 // Request Logger Middleware
 app.use((req: Request, res: Response, next) => {
   logger.info(`Incoming request: ${req.method} ${req.url}`);
@@ -28,8 +31,9 @@ app.get('/', async (req: Request, res: Response) => {
   return
 });
 
-import databaseRouter from './routes/database';
 app.use('/database', databaseRouter); // Mount the router at the `/database` path
+app.use('/auth', authRouter);
+app.use('/protecc', protectedRouter);
 
 
 
