@@ -1,9 +1,9 @@
 import dotenv from 'dotenv'
 const envFile = process.env.NODE_ENV === 'prod' ? '.env.prod' : '.env.dev';
-dotenv.config({ path: envFile, debug: true });
+dotenv.config({ path: envFile});
 import express, { Request, Response, Application } from 'express';
 import logger from './config/logger';
-import sequelize from './database';
+import sequelize from './database/database';
 import { User } from './database/models/User';
 
 const app: Application = express();
@@ -18,10 +18,6 @@ app.use((req: Request, res: Response, next) => {
 
 // Root Endpoint
 app.get('/', async (req: Request, res: Response) => {
-  console.log('DB Credentials:', process.env.NODE_ENV, process.env.DB_PASS);
-
-  // Authenticate and sync the Sequelize instance
-  await sequelize.authenticate();
   console.log('Database connected!');
 
   // Optionally, sync models (ensure tables exist)
@@ -30,15 +26,11 @@ app.get('/', async (req: Request, res: Response) => {
   const test = await User.findAll();
   res.json(test)
   return
-  logger.debug('Serving root endpoint');
-  res.status(200).send(`App running on ${process.env.NODE_ENV}`);
 });
 
-// Data Endpoint
-app.get('/data', (req: Request, res: Response) => {
-  logger.debug('Serving /data endpoint');
-  res.json({ name: "John" });
-});
+import databaseRouter from './routes/database';
+app.use('/database', databaseRouter); // Mount the router at the `/database` path
+
 
 
 // Start the server

@@ -1,7 +1,6 @@
 import { Sequelize } from 'sequelize-typescript';
 import { User } from './models/User'; // Adjust path as necessary
-
-console.log(process.env.DB_PASS)
+import logger from '../config/logger';
 // Initialize Sequelize instance
 const sequelize = new Sequelize({
   dialect: 'postgres', // Use 'mysql', 'sqlite', 'mssql', etc., if different
@@ -13,4 +12,13 @@ const sequelize = new Sequelize({
   logging: false,      // Disable SQL query logging (set true for debugging)
 });
 
+  // Authenticate and sync the Sequelize instance
+  sequelize
+  .authenticate()
+  .then(() => logger.info("Connected to the Database"))
+  .catch((err) => logger.error("Failed to authenticate:", err));
+  sequelize
+  .sync()
+  .then(() => logger.info("Successful synchonised to the database"))
+  .catch((err) => logger.error("Failed to synchonise:", err));
 export default sequelize;
