@@ -6,6 +6,7 @@ const expiresIn = '1h'; // Expiration time for the token (e.g., 1 hour)
 interface JwtPayload {
   sub: string; // User ID (or any unique identifier)
   iat: number; // Issued at time
+  roles: string[];
 }
 
 // Function to sign a JWT
@@ -13,6 +14,7 @@ export const generateToken = (userId: string): string => {
   const payload: JwtPayload = {
     sub: userId,
     iat: Math.floor(Date.now() / 1000), // Current timestamp in seconds
+    roles: ["admin"] 
   };
 
   return jwt.sign(payload, secretKey, { expiresIn });

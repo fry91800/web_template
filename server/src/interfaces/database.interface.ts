@@ -1,7 +1,6 @@
 // src/interfaces/database.interface.ts
 import { Sequelize } from 'sequelize-typescript';
 import { QueryInterface } from 'sequelize';
-import { User } from '../database/models/User';  // Import your models here
 
 // Interface to store the sequelize config
 export interface DatabaseConfig {
@@ -27,9 +26,6 @@ export interface TableInfo {
 export interface Database {
   sequelize: Sequelize;           // Sequelize instance
   config: DatabaseConfig;         // Database configuration
-  //models: {
-  //  User: typeof User;             // Add other models as needed
-  //};
   queryInterface: QueryInterface;  // Sequelize's QueryInterface for raw queries
   tables: TableInfo[];         // Array of table info objects
 }
