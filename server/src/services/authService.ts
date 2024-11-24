@@ -5,29 +5,51 @@ import { Database, DatabaseConfig, TableInfo } from '../interfaces/database.inte
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
 import logger from '../config/logger';
 import { getTablesInfo } from '../utils/database'
-
+class SignupError extends Error {
+  constructor(message: string, public statusCode: number) {
+    super(message);
+    this.name = 'SignupError';
+    Error.captureStackTrace(this, SignupError);
+  }
+}
 // Simply create a user, note that the pass will be hashed right before database insertion
-export async function signup(email: string, pass: string){
-  const newUser = { email, pass }
-  await User.create(newUser);
+export async function signup(email: string, pass: string) {
+  const transaction = await sequelize.transaction();
+  try {
+    const newUser = { email, pass }
+    const existingRecordWithMail = await User.findOne({ where: { email }, transaction });
+    if (existingRecordWithMail) {
+      throw new SignupError('Email already exists', 400);
+    }
+    logger.info(`Sign up: user: ${JSON.stringify(newUser)}...`);
+    await User.create(newUser, { transaction });
+    logger.info(`Sign up: OK`);
+    await transaction.commit();
+  }
+  catch(err){
+    await transaction.rollback();
+    throw err;
+  }
 }
 
 // Authenticate the password associated to the mail and send a secure JWT token to the client
-export async function getLoginTokens(email: string, pass: string){
+export async function getLoginTokens(email: string, pass: string) {
 
-    const user = await User.findOne({
-        where: { email: email }
-      });
-      if (!user)
-        {
-          throw new Error("no user");
-        }
-      
-        if (!await user.comparePassword(pass)) {
-            throw new Error("wrong password");
-        }
-        const userId = user.id;
-        const accessToken = generateAccessToken(userId);
-        const refreshToken = generateRefreshToken(userId);
-        return {accessToken, refreshToken }
+  logger.info(`Log in: mail: ${email}, pass: ${pass}`);
+  const user = await User.findOne({
+    where: { email: email }
+  });
+  if (!user) {
+    logger.info(`Log in: Failed: Mail not found`);
+    throw new Error("Mail not found");
   }
+
+  if (!await user.comparePassword(pass)) {
+    logger.info(`Log in: Failed: Wrong pass`);
+    throw new Error("wrong password");
+  }
+  const userId = user.id;
+  const accessToken = generateAccessToken(userId);
+  const refreshToken = generateRefreshToken(userId);
+  return { accessToken, refreshToken }
+}

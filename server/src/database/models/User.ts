@@ -1,6 +1,7 @@
 import { Table, Column, Model, DataType, BeforeCreate, PrimaryKey, Default } from 'sequelize-typescript';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid'; // Import uuidv4 function
+import logger from '../../config/logger'
 
 const saltRounds = parseInt(process.env.SALT_ROUNDS || '10', 10);
 

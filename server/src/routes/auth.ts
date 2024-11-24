@@ -14,6 +14,7 @@ router.post('/signup', validateRequest(signupSchema), async (req: Request, res: 
   return res.status(200).json({ message: 'Signup successful' });
   }
   catch(err){
+    //console.log(err)
     logger.error(err)
     next(); 
   }
@@ -22,20 +23,23 @@ router.post('/login', validateRequest(loginSchema), async (req: Request, res: Re
   try {
     const { email, pass } = req.body;
     const {accessToken, refreshToken } = await getLoginTokens(email, pass);
-    // Set the access token in an HTTP-only cookie
+    // Set the access token
+    const accessTokenMaxAge = parseInt(process.env.ACCESS_TOKEN_MAX_AGE || '3600000', 10);
     res.cookie('access_token', accessToken, {
       httpOnly: true, // Prevent access via JavaScript
       secure: process.env.NODE_ENV === 'prod', // Ensure HTTPS in production
       sameSite: 'strict', // Prevent cross-site requests
-      maxAge: 3600000, // Token expiration in milliseconds (1 hour)
+      maxAge: accessTokenMaxAge, // Token expiration in milliseconds (1 hour)
     });
-    // Set the access token in an HTTP-only cookie
+    // Set the refresh token
+    const refreshTokenMaxAge = parseInt(process.env.REFRESH_TOKEN_MAX_AGE || '2592000000', 10);
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true, // Prevent access via JavaScript
       secure: process.env.NODE_ENV === 'prod', // Ensure HTTPS in production
       sameSite: 'strict', // Prevent cross-site requests
-      maxAge: 30 * 24 * 60 * 60 * 1000 // Refresh token expires in 30 days
+      maxAge: 2592000000 // Refresh token expires in 30 days
     });
+    logger.info("Log in: OK")
     return res.status(200).json({ message: 'Login successful' });
   }
   catch (err) {
@@ -50,6 +54,7 @@ router.post('/logout', (req, res, next) => {
     res.clearCookie('access_token', { httpOnly: true, secure: process.env.NODE_ENV === 'production' }); // For access token
     res.clearCookie('refresh_token', { httpOnly: true, secure: process.env.NODE_ENV === 'production' }); // For refresh token
     res.status(200).json({ message: 'Logged out successfully' });
+    logger.info("Logout: OK")
   }
 
   catch(err){

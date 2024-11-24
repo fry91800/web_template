@@ -5,6 +5,7 @@ import express, { Request, Response, Application } from 'express';
 import cookieParser from 'cookie-parser';
 import logger from './config/logger';
 import { requestLogger } from './middleware/requestMiddleware';
+import { authenticate } from './middleware/authMiddleware';
 
 import sequelize from './database/database';
 import { User } from './database/models/User';
@@ -20,6 +21,9 @@ app.use(cookieParser());
 
 // Request Logger
 app.use(requestLogger);
+
+// Auth Middleware
+app.use(authenticate);
 
 
 // Root Endpoint
