@@ -15,7 +15,6 @@ router.post('/signup', (req: Request, res: Response): Response => {
     return res.status(400).json({ message: 'pass is required' });
   }
   const newUser = { email, pass }
-  console.log("creating user");
   User.create(newUser);
   return res.status(200).json({ message: 'Signup successful' });
 });
@@ -37,11 +36,13 @@ router.post('/login', async (req: Request, res: Response): Promise<express.Respo
   {
     return res.status(400).json({ message: 'Mail no exist' });
   }
+
+  if (!await user.comparePassword(pass)) {
+    return res.status(400).json({ message: 'wrong pass' });
+  }
   const userId = user.id;
   const accessToken = generateAccessToken(userId);
   const refreshToken = generateRefreshToken(userId);
-
-    console.log("login reached")
   // Set the token in an HTTP-only cookie
   res.cookie('access_token', accessToken, {
     httpOnly: true, // Prevent access via JavaScript
@@ -58,6 +59,15 @@ router.post('/login', async (req: Request, res: Response): Promise<express.Respo
   });
 
   return res.status(200).json({ message: 'Login successful' });
+});
+
+router.post('/logout', (req, res) => {
+  // Remove the access token and refresh token from cookies
+  res.clearCookie('access_token', { httpOnly: true, secure: process.env.NODE_ENV === 'production' }); // For access token
+  res.clearCookie('refresh_token', { httpOnly: true, secure: process.env.NODE_ENV === 'production' }); // For refresh token
+
+  // Optionally, respond with a success message
+  res.status(200).json({ message: 'Logged out successfully' });
 });
 
 export default router;
