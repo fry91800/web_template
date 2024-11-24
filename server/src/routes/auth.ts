@@ -1,10 +1,12 @@
 import express, { Router, Request, Response } from 'express';
 import { User } from '../database/models/User';
+import { validateRequest } from '../middleware/validateRequest';
+import { signupSchema } from '../schemas/authSchemas';
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
 
 const router = Router();
 
-router.post('/signup', (req: Request, res: Response): Response => {
+router.post('/signup', validateRequest(signupSchema), (req: Request, res: Response): Response => {
   const { email, pass } = req.body;
   if (!email) {
     // Explicitly return the response in case of a missing userId

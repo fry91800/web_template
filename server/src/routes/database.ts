@@ -6,7 +6,7 @@ import logger from '../config/logger';
 import * as databaseService from '../services/databaseService';
 const router = Router();
 
-// Endpoint to retrieve all of the database
+// Endpoint to retrieve database config and content
 router.get('/', async (req: express.Request, res: express.Response) => {
   try {
     const databaseInfo: Database = await databaseService.getDatabaseInfo();

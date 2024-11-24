@@ -4,6 +4,7 @@ dotenv.config({ path: envFile });
 import express, { Request, Response, Application } from 'express';
 import cookieParser from 'cookie-parser';
 import logger from './config/logger';
+import { requestLogger } from './middleware/requestMiddleware';
 
 import sequelize from './database/database';
 import { User } from './database/models/User';
@@ -16,24 +17,18 @@ const app: Application = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-// Request Logger Middleware
-app.use((req: Request, res: Response, next) => {
-  logger.info(`Incoming request: ${req.method} ${req.url}`);
-  next();
-});
+
+// Request Logger
+app.use(requestLogger);
+
 
 // Root Endpoint
 app.get('/', async (req: Request, res: Response) => {
-  console.log('Database connected!');
-
-  // Optionally, sync models (ensure tables exist)
-  await sequelize.sync({ alter: true });
-  //await User.create({ email: "fry91800@gmail.com", pass: "1234" });
-  const test = await User.findAll();
-  res.json(test)
+  res.send("Welcome to Web Template backend !")
   return
 });
 
+// Other routes
 app.use('/database', databaseRouter); // Mount the router at the `/database` path
 app.use('/auth', authRouter);
 app.use('/protecc', protectedRouter);

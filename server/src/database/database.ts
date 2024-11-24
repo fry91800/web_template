@@ -15,10 +15,10 @@ const sequelize = new Sequelize({
   // Authenticate and sync the Sequelize instance
   sequelize
   .authenticate()
-  .then(() => logger.info("Connected to the Database"))
+  .then(() => logger.info("Database Connection: OK"))
   .catch((err) => logger.error("Failed to authenticate:", err));
   sequelize
-  .sync()
-  .then(() => logger.info("Successful synchonised to the database"))
+  .sync({ alter: true })
+  .then(() => logger.info("Database Sync: OK"))
   .catch((err) => logger.error("Failed to synchonise:", err));
 export default sequelize;
