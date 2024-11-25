@@ -6,7 +6,7 @@ import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
 import logger from '../config/logger';
 import { getTablesInfo } from '../utils/database'
 class SignupError extends Error {
-  constructor(message: string, public statusCode: number) {
+  constructor(message: string, public status: number) {
     super(message);
     this.name = 'SignupError';
     Error.captureStackTrace(this, SignupError);
@@ -19,12 +19,14 @@ export async function signup(email: string, pass: string) {
     const newUser = { email, pass }
     const existingRecordWithMail = await User.findOne({ where: { email }, transaction });
     if (existingRecordWithMail) {
-      throw new SignupError('Email already exists', 400);
+      logger.info("Sign up: Failed: Email already taken")
+      throw new SignupError('Email already taken', 400);
     }
     logger.info(`Sign up: user: ${JSON.stringify(newUser)}...`);
-    await User.create(newUser, { transaction });
+    const inserted = await User.create(newUser, { transaction });
     logger.info(`Sign up: OK`);
     await transaction.commit();
+    return inserted;
   }
   catch(err){
     await transaction.rollback();

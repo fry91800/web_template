@@ -7,18 +7,21 @@ import logger from '../config/logger';
 
 const router = Router();
 
+// Sign up Endpoint
 router.post('/signup', validateRequest(signupSchema), async (req: Request, res: Response, next: NextFunction) => {
   try{
   const { email, pass } = req.body;
-  await signup(email, pass);
-  return res.status(200).json({ message: 'Signup successful' });
+  const newUser = await signup(email, pass);
+  return res
+  .status(201)
+  .json({ status: "success", data: {id: newUser.id, email: newUser.email} });
   }
   catch(err){
-    //console.log(err)
-    logger.error(err)
-    next(); 
+    next(err); 
   }
 });
+
+// Log in Middleware
 router.post('/login', validateRequest(loginSchema), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, pass } = req.body;
@@ -40,7 +43,7 @@ router.post('/login', validateRequest(loginSchema), async (req: Request, res: Re
       maxAge: 2592000000 // Refresh token expires in 30 days
     });
     logger.info("Log in: OK")
-    return res.status(200).json({ message: 'Login successful' });
+    return res.status(200).json({ message: 'Logged in successfully' });
   }
   catch (err) {
     logger.error(err)
@@ -51,8 +54,8 @@ router.post('/login', validateRequest(loginSchema), async (req: Request, res: Re
 
 router.post('/logout', (req, res, next) => {
   try{
-    res.clearCookie('access_token', { httpOnly: true, secure: process.env.NODE_ENV === 'production' }); // For access token
-    res.clearCookie('refresh_token', { httpOnly: true, secure: process.env.NODE_ENV === 'production' }); // For refresh token
+    res.clearCookie('access_token', { httpOnly: true, secure: process.env.NODE_ENV === 'prod' }); // For access token
+    res.clearCookie('refresh_token', { httpOnly: true, secure: process.env.NODE_ENV === 'prod' }); // For refresh token
     res.status(200).json({ message: 'Logged out successfully' });
     logger.info("Logout: OK")
   }

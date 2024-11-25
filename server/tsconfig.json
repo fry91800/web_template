@@ -25,7 +25,8 @@
   "include": [
     "src/*.ts",
     "src/**/*.ts",
-    "src/interfaces/request.interface.d.ts"  ],
+    "src/interfaces/request.interface.d.ts",
+    "src/interfaces/response.interface.d.ts"],
   "exclude": [
     "node_modules"
   ]

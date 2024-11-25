@@ -20,5 +20,5 @@ const sequelize = new Sequelize({
   sequelize
   .sync({ alter: true })
   .then(() => logger.info("Database Sync: OK"))
-  .catch((err) => logger.error("Failed to synchonise:", err));
+  .catch((err) => logger.error("Failed to synchronise:", err));
 export default sequelize;
