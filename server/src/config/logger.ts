@@ -31,24 +31,13 @@ const logger = createLogger({
     })
   ]
 });
+
+
+
 // Simple way to bypass a kind of bug that prevents from logging error properly
 const originalError = logger.error;
 // Override the `error` method
-logger.error = ((err: unknown) => {
-  if (err && typeof err === 'object' && 'message' in err && 'stack' in err) {
-    // @ts-ignore: We know `err` has a `message` property
-    originalError.call(logger, `${err.message} ${err.stack}`);  // Log the message from the object
-  }
-  else if (err && typeof err === 'object' && 'message' in err) {
-    // @ts-ignore: We know `err` has a `message` property
-    originalError.call(logger, err.message);  // Log the message from the object
-  }
-  else if (err && typeof err === 'string'){
-    // @ts-ignore: We know `err` has a `message` property
-    originalError.call(logger, err);  // Log the message from the object
-  }
-  else{
-    originalError.call(logger, { message: "An unknown error occurred" });
-  }
+logger.error = ((err: any) => {
+  originalError(`${err.stack}`);
 }) as winston.LeveledLogMethod;
 export default logger;

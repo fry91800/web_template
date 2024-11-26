@@ -41,7 +41,7 @@ app.use('/protecc', protectedRouter);
 // Error-Handling Middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   // Log the error
-  logger.error(`Error ${err.status}: ${err.message}`);
+  logger.error(err);
 
   // Determine status code and error message
   const statusCode = err.status || 500;

@@ -11,7 +11,6 @@ const sequelize = new Sequelize({
   models: [User],      // Add models here
   logging: false,      // Disable SQL query logging (set true for debugging)
 });
-
   // Authenticate and sync the Sequelize instance
   sequelize
   .authenticate()
@@ -20,5 +19,5 @@ const sequelize = new Sequelize({
   sequelize
   .sync({ alter: true })
   .then(() => logger.info("Database Sync: OK"))
-  .catch((err) => logger.error("Failed to synchronise:", err));
+  .catch((err) => logger.error(err));
 export default sequelize;
