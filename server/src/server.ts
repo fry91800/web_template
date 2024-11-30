@@ -40,24 +40,20 @@ app.use('/protecc', protectedRouter);
 
 // Error-Handling Middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  // Log the error
-  logger.error(err);
-
   if (err.status === 'fail')
   {
-    return res.status(err.statusCode).json({
-      status: err.status,
-      data: err.data
-    });
+    const jSendResponse = {status: err.status, data: err.data}
+    return res.status(err.statusCode).json(jSendResponse);
   }
+  logger.error(err);
 
   // Determine status code and error message
-  const statusCode = err.statusCode || 500;
+  const statusCode = err.statusCode || err.status || 500;
   const message = err.message || 'Internal Server Error';
+
+  const jSendResponse = {status: 'error', message: message, code: statusCode}
   // Respond to the client
-  res.status(statusCode).json({
-    status: "error"
-  });
+  res.status(statusCode).json(jSendResponse);
 });
 
 // Start the server only if not in test mode (in that case the server is started by the test)
