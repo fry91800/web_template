@@ -22,7 +22,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     const refreshToken = req.cookies.refresh_token;
     if (refreshToken) {
       logger.info("Authenticaton: Refreshing access token")
-      const refreshDecoded = verifyAccessToken(refreshToken);
+      const refreshDecoded = verifyRefreshToken(refreshToken);
 
       if (refreshDecoded) {
         accessToken = generateAccessToken(refreshDecoded.sub);
@@ -46,6 +46,6 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     next()
   }
   catch(err){
-    logger.error(err);
+    next(err)
   }
 };

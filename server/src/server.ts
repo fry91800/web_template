@@ -43,10 +43,17 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   // Log the error
   logger.error(err);
 
-  // Determine status code and error message
-  const statusCode = err.status || 500;
-  const message = err.message || 'Internal Server Error';
+  if (err.status === 'fail')
+  {
+    return res.status(err.statusCode).json({
+      status: err.status,
+      data: err.data
+    });
+  }
 
+  // Determine status code and error message
+  const statusCode = err.statusCode || 500;
+  const message = err.message || 'Internal Server Error';
   // Respond to the client
   res.status(statusCode).json({
     status: "error"
@@ -55,8 +62,8 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
 // Start the server only if not in test mode (in that case the server is started by the test)
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(3001, () => {
-    logger.info(`Server listening on http://localhost:3001 (${process.env.NODE_ENV})`);
+  app.listen(3001, '0.0.0.0', () => {
+    logger.info(`Server listening on http://0.0.0.0:3001 (${process.env.NODE_ENV})`);
   });
 }
 

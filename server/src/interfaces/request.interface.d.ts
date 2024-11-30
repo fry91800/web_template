@@ -5,6 +5,7 @@ declare global {
     namespace Express {
         interface Request {
             session?: JwtPayload; // Add your session property here
+            validatedBody?: any;
         }
     }
 }

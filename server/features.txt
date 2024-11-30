@@ -1,0 +1,36 @@
+Dev features:
+-GIT: OK
+-Env: OK
+-Logger: OK
+-Tests: OK
+-Linter/Formatter: OK
+-Types/interfaces ()
+-Docker
+-Types/interfaces
+-Cron Scheduling
+-Postgres Dump/Load
+-Files Dump/Load
+-Analytics
+-Performance Monitoring
+-Redis
+
+Core Backend features:
+-Auth: OK
+-DB dump endpoint: OK
+-Input Validation: OK
+-Create Update DELETE
+-Roles and permissions
+-Email Service
+-Rate limitting
+-User actions logging
+-Internationalization
+
+Core Frontend features:
+-Fetch from Backend
+-Mobile compatible
+-Light & Dark mode
+
+
+Core fullstack features:
+-Search filter sort pagination
+-File Dump/Load from app

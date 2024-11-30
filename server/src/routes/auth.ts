@@ -4,20 +4,22 @@ import { validateRequest } from '../middleware/validateMiddleware';
 import { signupSchema, loginSchema } from '../schemas/authSchemas';
 import { signup, getLoginTokens } from '../services/authService';
 import logger from '../config/logger';
+import { UserCredentials, UserSignUpData } from '../types/user'
 
 const router = Router();
 
 // Sign up Endpoint
 router.post('/signup', validateRequest(signupSchema), async (req: Request, res: Response, next: NextFunction) => {
-  try{
-  const { email, pass } = req.body;
-  const newUser = await signup(email, pass);
-  return res
-  .status(201)
-  .json({ status: "success", data: {id: newUser.id, email: newUser.email} });
+  try {
+    const userSignUpData: UserSignUpData = { email: req.body.email, pass: req.body.pass }
+    const newUser = await signup(userSignUpData);
+    const jSendResponse: JSendResponse = {status: "success", data: newUser};
+    return res
+      .status(201)
+      .json(jSendResponse);
   }
-  catch(err){
-    next(err); 
+  catch (err) {
+    next(err);
   }
 });
 
@@ -25,7 +27,7 @@ router.post('/signup', validateRequest(signupSchema), async (req: Request, res: 
 router.post('/login', validateRequest(loginSchema), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, pass } = req.body;
-    const {accessToken, refreshToken } = await getLoginTokens(email, pass);
+    const { accessToken, refreshToken } = await getLoginTokens(email, pass);
     // Set the access token
     const accessTokenMaxAge = parseInt(process.env.ACCESS_TOKEN_MAX_AGE || '3600000', 10);
     res.cookie('access_token', accessToken, {
@@ -53,14 +55,14 @@ router.post('/login', validateRequest(loginSchema), async (req: Request, res: Re
 });
 
 router.post('/logout', (req, res, next) => {
-  try{
+  try {
     res.clearCookie('access_token', { httpOnly: true, secure: process.env.NODE_ENV === 'prod' }); // For access token
     res.clearCookie('refresh_token', { httpOnly: true, secure: process.env.NODE_ENV === 'prod' }); // For refresh token
     res.status(200).json({ message: 'Logged out successfully' });
     logger.info("Logout: OK")
   }
 
-  catch(err){
+  catch (err) {
     logger.error(err)
     next();
   }

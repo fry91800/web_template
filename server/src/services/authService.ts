@@ -5,6 +5,8 @@ import { Database, DatabaseConfig, TableInfo } from '../interfaces/database.inte
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
 import logger from '../config/logger';
 import { getTablesInfo } from '../utils/database'
+import { UserCredentials } from '../types/user';
+import {Failure} from '../types/failure'
 class SignupError extends Error {
   constructor(message: string, public status: number) {
     super(message);
@@ -13,7 +15,7 @@ class SignupError extends Error {
   }
 }
 // Simply create a user, note that the pass will be hashed right before database insertion
-export async function signup(email: string, pass: string) {
+export async function oldsignup(email: string, pass: string) {
   const transaction = await sequelize.transaction();
   try {
     const newUser = { email, pass }
@@ -21,6 +23,28 @@ export async function signup(email: string, pass: string) {
     if (existingRecordWithMail) {
       logger.info("Sign up: Failed: Email already taken")
       throw new SignupError('Email already taken', 400);
+    }
+    logger.info(`Sign up: user: ${JSON.stringify(newUser)}...`);
+    const inserted = await User.create(newUser, { transaction });
+    logger.info(`Sign up: OK`);
+    await transaction.commit();
+    return inserted;
+  }
+  catch(err){
+    await transaction.rollback();
+    throw err;
+  }
+}
+
+// Simply create a user, note that the pass will be hashed right before database insertion
+export async function signup(userCredentials: UserCredentials): Promise<User> {
+  const transaction = await sequelize.transaction();
+  try {
+    const newUser = { email: userCredentials.email, pass: userCredentials.pass }
+    const existingRecordWithMail = await User.findOne({ where: { email: userCredentials.email }, transaction });
+    if (existingRecordWithMail) {
+      logger.info("Sign up: Failed: Email already taken")
+      throw new Failure(400, 'Email already exists', { "email": "Email already exists"});
     }
     logger.info(`Sign up: user: ${JSON.stringify(newUser)}...`);
     const inserted = await User.create(newUser, { transaction });
