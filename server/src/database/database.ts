@@ -17,7 +17,7 @@ const sequelize = new Sequelize({
   .then(() => logger.info("Database Connection: OK"))
   .catch((err) => logger.error("Failed to authenticate:", err));
   sequelize
-  .sync({ alter: true })
+  .sync()
   .then(() => logger.info("Database Sync: OK"))
   .catch((err) => logger.error(err));
 export default sequelize;

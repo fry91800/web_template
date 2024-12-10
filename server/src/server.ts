@@ -10,8 +10,8 @@ import sequelize from './database/database';
 import { User } from './database/models/User';
 
 // Routes
-import databaseRouter from './routes/database';
-import authRouter from './routes/auth';
+import databaseRouter from './routes/databaseRoute';
+import authRouter from './routes/authRoute';
 import protectedRouter from './routes/protectedRoute';
 
 const app: Application = express();
@@ -60,7 +60,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 if (process.env.NODE_ENV !== 'test') {
   app.listen(3001, '0.0.0.0', () => {
     logger.info(`Server listening on http://0.0.0.0:3001 (${process.env.NODE_ENV})`);
-  });
+});
 }
 
 export default app;

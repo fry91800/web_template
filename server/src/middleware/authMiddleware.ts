@@ -13,15 +13,15 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
       const accessDecoded = verifyAccessToken(accessToken);
 
       if (accessDecoded) {
-        logger.info("Authenticaton: OK")
+        logger.info(`Authentication: OK ${JSON.stringify(accessDecoded)}`)
         req.session = accessDecoded;
         return next();
       }
     }
-    // Access token expired or invalid: Refresh access token from redresh token
+    // Access token expired or invalid: Refresh access token from refresh token
     const refreshToken = req.cookies.refresh_token;
     if (refreshToken) {
-      logger.info("Authenticaton: Refreshing access token")
+      logger.info("Authentication: Refreshing access token")
       const refreshDecoded = verifyRefreshToken(refreshToken);
 
       if (refreshDecoded) {
@@ -35,14 +35,14 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
         });
         const accessDecoded = verifyAccessToken(accessToken);
         if (accessDecoded) {
-          logger.info("Authenticaton: OK")
+          logger.info(`Authentication: OK ${JSON.stringify(accessDecoded)}`)
           req.session = accessDecoded;
           return next();
         }
       }
     }
     // No token
-    logger.info("Authenticaton: No token")
+    logger.info("Authentication: No token")
     next()
   }
   catch(err){

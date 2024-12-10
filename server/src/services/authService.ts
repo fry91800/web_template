@@ -14,27 +14,6 @@ class SignupError extends Error {
     Error.captureStackTrace(this, SignupError);
   }
 }
-// Simply create a user, note that the pass will be hashed right before database insertion
-export async function oldsignup(email: string, pass: string) {
-  const transaction = await sequelize.transaction();
-  try {
-    const newUser = { email, pass }
-    const existingRecordWithMail = await User.findOne({ where: { email }, transaction });
-    if (existingRecordWithMail) {
-      logger.info("Sign up: Failed: Email already taken")
-      throw new SignupError('Email already taken', 400);
-    }
-    logger.info(`Sign up: user: ${JSON.stringify(newUser)}...`);
-    const inserted = await User.create(newUser, { transaction });
-    logger.info(`Sign up: OK`);
-    await transaction.commit();
-    return inserted;
-  }
-  catch(err){
-    await transaction.rollback();
-    throw err;
-  }
-}
 
 // Simply create a user, note that the pass will be hashed right before database insertion
 export async function signup(userCredentials: UserCredentials): Promise<User> {
@@ -67,12 +46,12 @@ export async function getLoginTokens(email: string, pass: string) {
   });
   if (!user) {
     logger.info(`Log in: Failed: Mail not found`);
-    throw new Error("Mail not found");
+    throw new Failure(400, 'Email not found', { "email": "Email not found"});
   }
 
   if (!await user.comparePassword(pass)) {
     logger.info(`Log in: Failed: Wrong pass`);
-    throw new Error("wrong password");
+    throw new Failure(400, 'Wrong password', { "pass": "Wrong password"});
   }
   const userId = user.id;
   const accessToken = generateAccessToken(userId);

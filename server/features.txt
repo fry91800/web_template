@@ -4,25 +4,24 @@ Dev features:
 -Logger: OK
 -Tests: OK
 -Linter/Formatter: OK
--Types/interfaces ()
--Docker
--Types/interfaces
+-Types/interfaces: Partially
+-Postgres Dump/Load: OK
 -Cron Scheduling
--Postgres Dump/Load
--Files Dump/Load
 -Analytics
--Performance Monitoring
--Redis
+-Docker(Not a priority)
+-Performance Monitoring(Not a priority)
+-Redis(Not a priority)
 
 Core Backend features:
 -Auth: OK
--DB dump endpoint: OK
+-DB View: OK
+-DB Modification
+-Files Dump/Load
 -Input Validation: OK
--Create Update DELETE
--Roles and permissions
--Email Service
+-Roles and permissions (RBAC)
 -Rate limitting
--User actions logging
+-User actions logging (single table)
+-Email Service
 -Internationalization
 
 Core Frontend features:

@@ -1,0 +1,1 @@
+PGPASSWORD=posert pg_dump --create -h localhost -p 5432 -U postgres -d postgres -F p -f ./dump.sql

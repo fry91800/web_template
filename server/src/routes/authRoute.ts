@@ -49,7 +49,7 @@ router.post('/login', validateRequest(loginSchema), async (req: Request, res: Re
   }
   catch (err) {
     logger.error(err)
-    next();
+    next(err);
   }
 
 });
