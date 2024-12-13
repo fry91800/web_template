@@ -13,7 +13,6 @@ import { User } from './database/models/User';
 import databaseRouter from './routes/databaseRoute';
 import authRouter from './routes/authRoute';
 import protectedRouter from './routes/protectedRoute';
-import fileRouter from './routes/fileRoute';
 
 const app: Application = express();
 
@@ -38,7 +37,6 @@ app.get('/', async (req: Request, res: Response) => {
 app.use('/database', databaseRouter); // Mount the router at the `/database` path
 app.use('/auth', authRouter);
 app.use('/protecc', protectedRouter);
-app.use('/file', fileRouter);
 
 // Error-Handling Middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

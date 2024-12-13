@@ -1,6 +1,8 @@
 **/node_modules/
+**/uploads/
 **/.next/
 server/.env.dev
 server/.env.prod
 **/tsconfig.tsbuildinfo
 **/dist
+**/logs

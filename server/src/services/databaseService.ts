@@ -75,3 +75,10 @@ function getModel(table: string): ModelStatic<Model> {
   return model;
 }
 
+// Upload a file
+export async function uploadFromFile(type: string, file: Express.Multer.File | undefined) {
+  if (!file) {
+      throw new Failure(400, 'No file uploaded', { "file": "No file uploaded"});
+  }
+    return
+}

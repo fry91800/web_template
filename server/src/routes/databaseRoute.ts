@@ -1,12 +1,13 @@
 
-import express, { Router, Request, Response } from 'express';
+import express, { Router, Request, Response, NextFunction } from 'express';
 import { Database, DatabaseConfig, TableInfo } from '../interfaces/database.interface'; 
 import sequelize from '../database/database';
 import logger from '../config/logger';
 import * as databaseService from '../services/databaseService';
+import upload from '../config/multer';
 const router = Router();
 
-// Endpoint to retrieve database config and content
+// Retrieve all
 router.get('/read', async (req: express.Request, res: express.Response, next) => {
   try {
     const databaseInfo: Database = await databaseService.getDatabaseInfo();
@@ -20,7 +21,7 @@ router.get('/read', async (req: express.Request, res: express.Response, next) =>
     next(err);
   }
 });
-// Endpoint to modify database content
+// Insert Update and Delete
 router.post('/write', async (req: express.Request, res: express.Response, next) => {
   try {
     const query= req.body;
@@ -32,6 +33,23 @@ router.post('/write', async (req: express.Request, res: express.Response, next) 
       .json(jSendResponse);
   } catch (err) {
     logger.error(err)
+    next(err);
+  }
+});
+
+
+router.post('/upload', upload.single('file'), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+      const type = req.body.type;
+      const file = req.file;
+      await databaseService.uploadFromFile(type, file);
+  
+      const jSendResponse: JSendResponse = { status: "success", data: {} };
+      return res
+        .status(200)
+        .json(jSendResponse);
+  }
+  catch (err) {
     next(err);
   }
 });
