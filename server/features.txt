@@ -15,14 +15,18 @@ Dev features:
 Core Backend features:
 -Auth: OK
 -DB View: OK
--DB Modification
--Files Dump/Load
+-DB Modification: OK
+-DB File Load
+-DB File dump
+-Email Service
+-Internationalization
+
+Core Backend processing:
 -Input Validation: OK
 -Roles and permissions (RBAC)
 -Rate limitting
 -User actions logging (single table)
--Email Service
--Internationalization
+
 
 Core Frontend features:
 -Fetch from Backend

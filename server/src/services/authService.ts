@@ -7,13 +7,6 @@ import logger from '../config/logger';
 import { getTablesInfo } from '../utils/database'
 import { UserCredentials } from '../types/user';
 import {Failure} from '../types/failure'
-class SignupError extends Error {
-  constructor(message: string, public status: number) {
-    super(message);
-    this.name = 'SignupError';
-    Error.captureStackTrace(this, SignupError);
-  }
-}
 
 // Simply create a user, note that the pass will be hashed right before database insertion
 export async function signup(userCredentials: UserCredentials): Promise<User> {

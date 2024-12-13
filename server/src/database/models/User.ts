@@ -32,17 +32,40 @@ export class User extends Model {
   pass!: string;
 
   // Hash the password before saving the user to the database
-  @BeforeCreate
-  static async hashPassword(user: User) {
-    if (user.pass) {
-      // Hash the password using bcrypt with dynamic salt rounds
-      user.pass = await bcrypt.hash(user.pass, saltRounds);
-    }
+  //@BeforeCreate
+  static async hashPassword(pass: string) {
+      return bcrypt.hash(pass, saltRounds);
   }
 
   // Method to compare the password with the hashed password
   async comparePassword(plainPassword: string): Promise<boolean> {
     return bcrypt.compare(plainPassword, this.pass); // Compare with the stored hash
   }
+  static registerHooks() {
+    this.beforeCreate(async (user) => {
+      if (user.pass)
+      {
+        user.pass = await User.hashPassword(user.pass)
+      }
+    });
+    this.beforeBulkCreate(async (users) => {
+      for (const user of users) {
+        if (user.pass)
+          {
+            user.pass = await User.hashPassword(user.pass)
+          }
+      }
+    });
+    this.beforeUpdate(async (user) => {
+      console.log(user)
+      console.log("test")
+      if (user.pass)
+        {
+          user.pass = await User.hashPassword(user.pass)
+        }
+    });
+  }
 }
+
+
 

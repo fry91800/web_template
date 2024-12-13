@@ -4,7 +4,7 @@ import { Database, DatabaseConfig, TableInfo } from '../interfaces/database.inte
 import logger from '../config/logger';
 import { getTablesInfo } from '../utils/database'
 import { Sequelize, Model, ModelStatic } from 'sequelize';
-import {Failure} from '../types/failure'
+import { Failure } from '../types/failure'
 
 
 export async function getDatabaseInfo() {
@@ -33,34 +33,44 @@ export async function writeDatabase(query: Query): Promise<void> {
   switch (type) {
     case 'insert': {
       const { data } = query;
-      await model.create(data);
+      await model.bulkCreate(data);
       logger.info(`Inserted data into ${table}`);
       break;
     }
 
     case 'update': {
-      const { where, data } = query;
-      await model.update(data, { where });
-      logger.info(`Updated data in ${table} where`, where);
+      const { data } = query;
+      for (const line of data) {
+        const user = await model.findOne({ where: line.where });
+        if (user) {
+          await user.update(line.update);
+        }
+      }
+      logger.info(`Updated data in ${table}`);
       break;
     }
 
     case 'delete': {
-      const { where } = query;
-      await model.destroy({ where });
-      logger.info(`Deleted data from ${table} where`, where);
+      const { data } = query;
+      for (const line of data) {
+        const user = await model.findOne({ where: line.where });
+        if (user) {
+          await user.destroy();
+        }
+      }
+      logger.info(`Deleted data from ${table}`);
       break;
     }
 
     default:
-      throw new Failure(400, "Query type doesn't exist", { "type": "Query type doesn't exist"});
+      throw new Failure(400, "Query type doesn't exist", { "type": "Query type doesn't exist" });
   }
 }
 // Helper function to get the model by table name
 function getModel(table: string): ModelStatic<Model> {
   const model = sequelize.models[table];
   if (!model) {
-    throw new Failure(400, "Table doesn't exist", { "table": "Table doesn't exist"});
+    throw new Failure(400, "Table doesn't exist", { "table": "Table doesn't exist" });
   }
   return model;
 }

@@ -5,18 +5,19 @@ import logger from '../config/logger';
 const sequelize = new Sequelize({
   dialect: 'postgres', // Use 'mysql', 'sqlite', 'mssql', etc., if different
   host: process.env.DB_HOST,   // Your database host
-  username: process.env.DB_USER ,
-  password: process.env.DB_PASS ,
-  database: process.env.DB_NAME ,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
   models: [User],      // Add models here
   logging: false,      // Disable SQL query logging (set true for debugging)
 });
-  // Authenticate and sync the Sequelize instance
-  sequelize
+User.registerHooks();
+// Authenticate and sync the Sequelize instance
+sequelize
   .authenticate()
   .then(() => logger.info("Database Connection: OK"))
   .catch((err) => logger.error("Failed to authenticate:", err));
-  sequelize
+sequelize
   .sync()
   .then(() => logger.info("Database Sync: OK"))
   .catch((err) => logger.error(err));

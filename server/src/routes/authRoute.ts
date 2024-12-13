@@ -13,7 +13,7 @@ router.post('/signup', validateRequest(signupSchema), async (req: Request, res: 
   try {
     const userSignUpData: UserSignUpData = { email: req.body.email, pass: req.body.pass }
     const newUser = await signup(userSignUpData);
-    const jSendResponse: JSendResponse = {status: "success", data: newUser};
+    const jSendResponse: JSendResponse = { status: "success", data: newUser };
     return res
       .status(201)
       .json(jSendResponse);
@@ -45,7 +45,11 @@ router.post('/login', validateRequest(loginSchema), async (req: Request, res: Re
       maxAge: 2592000000 // Refresh token expires in 30 days
     });
     logger.info("Log in: OK")
-    return res.status(200).json({ message: 'Logged in successfully' });
+
+    const jSendResponse: JSendResponse = { status: "success", data: { email } };
+    return res
+      .status(200)
+      .json(jSendResponse);
   }
   catch (err) {
     logger.error(err)
@@ -58,8 +62,11 @@ router.post('/logout', (req, res, next) => {
   try {
     res.clearCookie('access_token', { httpOnly: true, secure: process.env.NODE_ENV === 'prod' }); // For access token
     res.clearCookie('refresh_token', { httpOnly: true, secure: process.env.NODE_ENV === 'prod' }); // For refresh token
-    res.status(200).json({ message: 'Logged out successfully' });
     logger.info("Logout: OK")
+    const jSendResponse: JSendResponse = { status: "success", data: {} };
+    return res
+      .status(200)
+      .json(jSendResponse);
   }
 
   catch (err) {
