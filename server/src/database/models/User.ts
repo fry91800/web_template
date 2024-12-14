@@ -57,8 +57,6 @@ export class User extends Model {
       }
     });
     this.beforeUpdate(async (user) => {
-      console.log(user)
-      console.log("test")
       if (user.pass)
         {
           user.pass = await User.hashPassword(user.pass)

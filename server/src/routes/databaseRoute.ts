@@ -42,7 +42,7 @@ router.post('/upload', upload.single('file'), async (req: Request, res: Response
   try {
       const type = req.body.type;
       const file = req.file;
-      await databaseService.uploadFromFile(type, file);
+      await databaseService.writeFromFile(type, file);
   
       const jSendResponse: JSendResponse = { status: "success", data: {} };
       return res
