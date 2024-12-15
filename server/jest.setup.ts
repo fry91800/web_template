@@ -1,5 +1,5 @@
 import sequelize from './src/database/database';
-import app from './src/server'; // Your Express app
+import app from './src/app'; // Your Express app
 
 let server: any;
 

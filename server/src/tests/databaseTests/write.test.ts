@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from '../../server';
+import app from '../../app';
 import { User } from '../../database/models/User';
 
 describe('POST /database/write', () => {

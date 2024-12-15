@@ -5,15 +5,18 @@ import { Database, DatabaseConfig, TableInfo } from '../interfaces/database.inte
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
 import logger from '../config/logger';
 import { getTablesInfo } from '../utils/database'
-import { UserCredentials } from '../types/user';
+import { UserCredentials, UserSignUpData } from '../types/user';
 import {Failure} from '../types/failure'
 
-// Simply create a user, note that the pass will be hashed right before database insertion
-export async function signup(userCredentials: UserCredentials): Promise<User> {
+/*
+Add the user passed in parameters in the database and return the inserted
+user or throws a failure
+*/
+export async function signup(userSignUpData: UserSignUpData): Promise<User> {
   const transaction = await sequelize.transaction();
   try {
-    const newUser = { email: userCredentials.email, pass: userCredentials.pass }
-    const existingRecordWithMail = await User.findOne({ where: { email: userCredentials.email }, transaction });
+    const newUser = { email: userSignUpData.email, pass: userSignUpData.pass }
+    const existingRecordWithMail = await User.findOne({ where: { email: userSignUpData.email }, transaction });
     if (existingRecordWithMail) {
       logger.info("Sign up: Failed: Email already taken")
       throw new Failure(400, 'Email already exists', { "email": "Email already exists"});
@@ -30,19 +33,22 @@ export async function signup(userCredentials: UserCredentials): Promise<User> {
   }
 }
 
-// Authenticate the password associated to the mail and send a secure JWT token to the client
-export async function getLoginTokens(email: string, pass: string) {
+/*
+Add the user passed in parameters in the database and return
+both access and refresh tokens, or throws a failure
+*/
+export async function getLoginTokens(userCredentials: UserCredentials) {
 
-  logger.info(`Log in: mail: ${email}, pass: ${pass}`);
+  logger.info(`Log in attempt: mail: ${userCredentials.email}, pass: ${userCredentials.pass}`);
   const user = await User.findOne({
-    where: { email: email }
+    where: { email: userCredentials.email }
   });
   if (!user) {
     logger.info(`Log in: Failed: Mail not found`);
     throw new Failure(400, 'Email not found', { "email": "Email not found"});
   }
 
-  if (!await user.comparePassword(pass)) {
+  if (!await user.comparePassword(userCredentials.pass)) {
     logger.info(`Log in: Failed: Wrong pass`);
     throw new Failure(400, 'Wrong password', { "pass": "Wrong password"});
   }

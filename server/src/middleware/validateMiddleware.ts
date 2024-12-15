@@ -5,6 +5,7 @@ import logger from '../config/logger'
 export const validateRequest =
   (schema: ZodSchema) =>
     (req: Request, res: Response, next: NextFunction): void | Response => {
+      logger.info(`Validation: input: ${JSON.stringify(req.body)}`)
       const validationResult = schema.safeParse(req.body);
 
       if (!validationResult.success) {
@@ -22,5 +23,6 @@ export const validateRequest =
       }
       // Attach validated data to the request object for further use
       req.validatedBody = validationResult.data;
+      logger.info(`Validation: output: ${JSON.stringify(req.validatedBody)}`)
       next();
     };

@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "dotenv -e .env.test -- jest --detectOpenHandles",
-    "dev": "dotenv -e .env.dev -- nodemon --watch src --exec ts-node --files src/server.ts",
+    "dev": "dotenv -e .env.dev -- nodemon --watch src --exec ts-node --files src/app.ts",
     "build": "npx tsc",
-    "start": "dotenv -e .env.prod -- node dist/server.js"
+    "start": "dotenv -e .env.prod -- node dist/app.js"
   },
   "keywords": [],
   "author": "",

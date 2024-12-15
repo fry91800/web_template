@@ -8,10 +8,9 @@ import { UserCredentials, UserSignUpData } from '../types/user'
 
 const router = Router();
 
-// Sign up Endpoint
 router.post('/signup', validateRequest(signupSchema), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userSignUpData: UserSignUpData = { email: req.body.email, pass: req.body.pass }
+    const userSignUpData: UserSignUpData = { email: req.validatedBody.email, pass: req.validatedBody.pass }
     const newUser = await signup(userSignUpData);
     const jSendResponse: JSendResponse = { status: "success", data: newUser };
     return res
@@ -26,8 +25,8 @@ router.post('/signup', validateRequest(signupSchema), async (req: Request, res: 
 // Log in Middleware
 router.post('/login', validateRequest(loginSchema), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, pass } = req.body;
-    const { accessToken, refreshToken } = await getLoginTokens(email, pass);
+    const userSignUpData: UserSignUpData = { email: req.validatedBody.email, pass: req.validatedBody.pass }
+    const { accessToken, refreshToken } = await getLoginTokens(userSignUpData);
     // Set the access token
     const accessTokenMaxAge = parseInt(process.env.ACCESS_TOKEN_MAX_AGE || '3600000', 10);
     res.cookie('access_token', accessToken, {
@@ -46,7 +45,7 @@ router.post('/login', validateRequest(loginSchema), async (req: Request, res: Re
     });
     logger.info("Log in: OK")
 
-    const jSendResponse: JSendResponse = { status: "success", data: { email } };
+    const jSendResponse: JSendResponse = { status: "success", data: { email: userSignUpData } };
     return res
       .status(200)
       .json(jSendResponse);
