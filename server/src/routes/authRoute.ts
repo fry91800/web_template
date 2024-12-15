@@ -22,11 +22,10 @@ router.post('/signup', validateRequest(signupSchema), async (req: Request, res: 
   }
 });
 
-// Log in Middleware
 router.post('/login', validateRequest(loginSchema), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userSignUpData: UserSignUpData = { email: req.validatedBody.email, pass: req.validatedBody.pass }
-    const { accessToken, refreshToken } = await getLoginTokens(userSignUpData);
+    const userCredentials: UserCredentials = { email: req.validatedBody.email, pass: req.validatedBody.pass }
+    const { accessToken, refreshToken } = await getLoginTokens(userCredentials);
     // Set the access token
     const accessTokenMaxAge = parseInt(process.env.ACCESS_TOKEN_MAX_AGE || '3600000', 10);
     res.cookie('access_token', accessToken, {
@@ -45,7 +44,7 @@ router.post('/login', validateRequest(loginSchema), async (req: Request, res: Re
     });
     logger.info("Log in: OK")
 
-    const jSendResponse: JSendResponse = { status: "success", data: { email: userSignUpData } };
+    const jSendResponse: JSendResponse = { status: "success", data: { email: userCredentials.email } };
     return res
       .status(200)
       .json(jSendResponse);

@@ -70,11 +70,7 @@ async function updateMany(model: ModelStatic<Model<any, any>>, data: any) {
   for (const line of data) {
     const user = await model.findOne({ where: line.where });
     if (user) {
-      console.log(user)
       await user.update(line.update);
-      console.log(line.update)
-      console.log("after")
-      console.log(user)
     }
   }
 }
@@ -108,7 +104,42 @@ function csvToJson<T extends Record<string, any>>(csv: string, delimiter: string
   return json;
 }
 
-// Upload a file
+export function fileToQueryData(type: queryString, file: Express.Multer.File | undefined)
+{
+  if (!file) {
+    throw new Failure(400, 'No file uploaded', { "file": "No file uploaded" });
+  }
+  const fileString = fs.readFileSync(file.path, 'utf-8');
+  var jsonData = csvToJson(fileString);
+  switch (type) {
+    case 'insert': {
+      logger.info("File To Query Data: Insert query type: data already formatted");
+      break;
+    }
+
+    case 'update': {
+      jsonData = jsonData.map(item => ({
+        where: { id: item.id },
+        update: { email: item.email, pass: item.pass },
+      }));
+      logger.info("File To Query Data: Converted file input into update query");
+      break;
+    }
+
+    case 'delete': {
+      jsonData = jsonData.map(item => ({
+        where: { id: item.id }
+      }));
+      logger.info("File To Query Data: Converted file input into delete query");
+      break;
+    }
+
+    default:
+      throw new Failure(400, "Query type doesn't exist", { "type": "Query type doesn't exist" });
+  }
+  return jsonData
+}
+// Write to the database from a file
 export async function writeFromFile(type: queryString, file: Express.Multer.File | undefined) {
   if (!file) {
     throw new Failure(400, 'No file uploaded', { "file": "No file uploaded" });
@@ -146,6 +177,5 @@ export async function writeFromFile(type: queryString, file: Express.Multer.File
     default:
       throw new Failure(400, "Query type doesn't exist", { "type": "Query type doesn't exist" });
   }
-  console.log(jsonData);
   return
 }

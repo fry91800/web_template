@@ -1,6 +1,6 @@
 
 import express, { Router, Request, Response, NextFunction } from 'express';
-import { Database, DatabaseConfig, TableInfo } from '../interfaces/database.interface'; 
+import { Database, DatabaseConfig, TableInfo } from '../interfaces/database.interface';
 import sequelize from '../database/database';
 import logger from '../config/logger';
 import * as databaseService from '../services/databaseService';
@@ -24,10 +24,9 @@ router.get('/read', async (req: express.Request, res: express.Response, next) =>
 // Insert Update and Delete
 router.post('/write', async (req: express.Request, res: express.Response, next) => {
   try {
-    const query= req.body;
-    console.log(req.body)
+    const query: Query = req.body;
     await databaseService.writeDatabase(query);
-    const jSendResponse: JSendResponse = {status: "success", data: {}};
+    const jSendResponse: JSendResponse = { status: "success", data: {} };
     return res
       .status(200)
       .json(jSendResponse);
@@ -40,14 +39,17 @@ router.post('/write', async (req: express.Request, res: express.Response, next) 
 
 router.post('/upload', upload.single('file'), async (req: Request, res: Response, next: NextFunction) => {
   try {
-      const type = req.body.type;
-      const file = req.file;
-      await databaseService.writeFromFile(type, file);
-  
-      const jSendResponse: JSendResponse = { status: "success", data: {} };
-      return res
-        .status(200)
-        .json(jSendResponse);
+    const type = req.body.type;
+    const table = req.body.table;
+    const file = req.file;
+    const data = databaseService.fileToQueryData(type, file)
+    const query: Query = { type, table, data }
+    await databaseService.writeDatabase(query);
+
+    const jSendResponse: JSendResponse = { status: "success", data: {} };
+    return res
+      .status(200)
+      .json(jSendResponse);
   }
   catch (err) {
     next(err);
