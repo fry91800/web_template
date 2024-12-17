@@ -7,15 +7,33 @@ import * as databaseService from '../services/databaseService';
 import upload from '../config/multer';
 const router = Router();
 
-// Retrieve all
+// All database
 router.get('/read', async (req: express.Request, res: express.Response, next) => {
   try {
     const databaseInfo: Database = await databaseService.getDatabaseInfo();
-    const response = {
+    const responseData = {
       config: databaseInfo.config,
       tables: databaseInfo.tables,
     }
-    res.json(response);
+    const response: JSendResponse = {
+      status: "success",
+      data: {database: responseData},
+    }
+    res.status(200).json(response);
+  } catch (err) {
+    logger.error(err)
+    next(err);
+  }
+});
+router.get('/read/:table', async (req: express.Request, res: express.Response, next) => {
+  try {
+    const tableInfo: TableInfo = await databaseService.getTableInfo(req.params.table);
+    const response: JSendResponse = {
+      status: "success",
+      data: {table: tableInfo},
+    }
+    logger.info(response)
+    res.status(200).json(response);
   } catch (err) {
     logger.error(err)
     next(err);

@@ -8,6 +8,7 @@ import { requestLogger } from './middleware/requestMiddleware';
 import { authenticate } from './middleware/authMiddleware';
 import sequelize from './database/database';
 import { User } from './database/models/User';
+import cors from 'cors';
 
 // Routes
 import databaseRouter from './routes/databaseRoute';
@@ -19,6 +20,7 @@ const app: Application = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(cors());
 
 // Request Logger Middleware
 app.use(requestLogger);

@@ -6,7 +6,7 @@ describe('POST /database/write', () => {
     it('should insert', async () => {
         const response = await request(app)
             .post('/database/write')
-            .send({ type: 'insert', table: 'User', data: { email: "test@gmail.com", pass: "123456" } });
+            .send({ type: 'insert', table: 'User', data: [{ email: "test@gmail.com", pass: "123456" }] });
         expect(response.status).toBe(200);
     });
     it('should update', async () => {

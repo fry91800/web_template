@@ -2,7 +2,7 @@ import express, { Router, Request, Response } from 'express';
 import sequelize from '../database/database';
 import { Database, DatabaseConfig, TableInfo } from '../interfaces/database.interface';  // Import the interfaces
 import logger from '../config/logger';
-import { getTablesInfo } from '../utils/database'
+import * as databaseUtils from '../utils/database'
 import { Sequelize, Model, ModelStatic } from 'sequelize';
 import { Failure } from '../types/failure'
 import fs from 'fs';
@@ -10,7 +10,7 @@ import fs from 'fs';
 
 export async function getDatabaseInfo() {
   // Step 1: Get each table information
-  const tables: TableInfo[] = await getTablesInfo();
+  const tables: TableInfo[] = await databaseUtils.getTablesInfo();
   // Step 2: Get the whole database information
   const databaseInfo = {
     sequelize,
@@ -24,6 +24,11 @@ export async function getDatabaseInfo() {
     tables: tables,
   };
   return databaseInfo;
+}
+
+export async function getTableInfo(tableName: string) {
+  const tableInfo: TableInfo = await databaseUtils.getTableInfo(tableName);
+  return tableInfo;
 }
 
 
