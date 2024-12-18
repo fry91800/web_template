@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import DataTable from '../../../../components/DataTable'
+import DataTable from '../../../../components/DataTable/DataTable'
 
 const AdminParamPage = () => {
     const { query } = useRouter();
@@ -17,17 +17,7 @@ const AdminParamPage = () => {
                 })
                 .then(result => {
                     console.log('Fetched data:', result);  // Check fetched data
-                    const formattedData = { headers: [] as string[], data: [] as Record<string, any>[] };
-                    if (result?.data?.table) {
-                        for (const column of result.data.table.columns)
-                            formattedData.headers.push(column.name)
-                        formattedData.data = [{ 'id': 1, "email": "a@a.com", "pass": "1234" }]
-                        console.log(formattedData)
-                        const test = { data: formattedData }
-
-                        console.log(test.data)
-                        setData(DataTable(test.data))
-                    }
+                    setData(result.data)
                 })
                 .catch((err) => {
                     console.error('Fetch error:', err);
@@ -37,12 +27,13 @@ const AdminParamPage = () => {
 
     useEffect(() => {
         console.log('Updated data:', typeof data); // Logs data after state update
+        setData(data)
     }, [data]);
 
     return (
         <div>
             <h1>Parameter: {query.param}</h1>
-            <pre>{data}</pre>
+            {data ? <DataTable data={data} /> : <p>No data available</p>}
         </div>
     );
 };
