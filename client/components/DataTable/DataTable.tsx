@@ -4,12 +4,9 @@ import DeleteButton from "../DeleteButton/DeleteButton";
 
 interface DataTableProps {
   data: { table: { columns: any[]; data: any[] } } | null;
+  handleDelete: (id: string) => void;
 }
-const DataTable: React.FC<DataTableProps> = ({data}) => {
-  
-  const handleDelete = (id: string) => {
-    alert("handleDelete");
-  };
+const DataTable: React.FC<DataTableProps> = ({data, handleDelete}) => {
 
   return (
     <table className={styles.table} style={{ borderCollapse: "collapse", width: "100%" }}>
