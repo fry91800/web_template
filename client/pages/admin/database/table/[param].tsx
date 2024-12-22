@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import RawDataTable from '../../../../components/DataTable/RawDataTable'
 import RawDataTableNewButton from '../../../../components/DataTable/RawDataTableNewButton'
+import RawDataTableForm from '../../../../components/DataTable/RawDataTableForm'
 import { table } from 'console';
 
 function RawDataTablePage() {
@@ -74,16 +75,26 @@ function RawDataTablePage() {
         newData.data = newData.data.filter((row: any) => row.id !== id);
         setData(newData);
     };
-    const handleNew = async () => {
-        const newData = JSON.parse(JSON.stringify(data));
-        const newMockUpUser =             {
-            "id": "dbbe6c2b-d4ac-4dcc-894b-978a9595d012",
-            "email": "new@gmail.com",
-            "pass": "$2b$10$R45iuwrSbb.zHXtX4wBIAu99KUmOir6RckKTiGDbJREzUANDiImAi",
-            "createdAt": "2024-12-22T00:38:08.417Z",
-            "updatedAt": "2024-12-22T00:38:08.417Z"
+    const handleInsert = async (object: any[]) => {
+        const request = {
+            type: "insert",
+            table: query.param,
+            data: [object]
         }
-        newData.data.push(newMockUpUser)
+        const response = await fetch("http://localhost:3001/database/write", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(request),
+        });
+        const responseJson = await response.json();
+        if (responseJson.status !== "success") {
+            return
+        }
+        const newObject = responseJson.data[0]
+        const newData = JSON.parse(JSON.stringify(data));
+        newData.data.push(newObject)
         setData(newData);
     };
 
@@ -107,8 +118,8 @@ function RawDataTablePage() {
     return (
         <div>
             <h1>{query.param}</h1>
-            <RawDataTableNewButton handleNew={handleNew}/>
             {data ? <RawDataTable data={data} handleDelete={handleDelete} /> : <p>Loading...</p>}
+            {data && query.param ? <RawDataTableForm handleInsert={handleInsert} fields={data.columns} table={query.param} /> : <p>Loading...</p>}
         </div>
     );
 };

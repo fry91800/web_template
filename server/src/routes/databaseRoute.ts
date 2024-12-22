@@ -43,8 +43,9 @@ router.get('/read/:table', async (req: express.Request, res: express.Response, n
 router.post('/write', async (req: express.Request, res: express.Response, next) => {
   try {
     const query: Query = req.body;
-    await databaseService.writeDatabase(query);
-    const jSendResponse: JSendResponse = { status: "success", data: {} };
+    console.log(query)
+    const responseData = await databaseService.writeDatabase(query);
+    const jSendResponse: JSendResponse = { status: "success", data: responseData };
     return res
       .status(200)
       .json(jSendResponse);

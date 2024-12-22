@@ -32,28 +32,28 @@ export async function getTableInfo(tableName: string) {
 }
 
 
-export async function writeDatabase(query: Query): Promise<void> {
+export async function writeDatabase(query: Query): Promise<any>{
   const { type, table } = query;
   const model = getModel(table);
-
+  let response = null;
   switch (type) {
     case 'insert': {
       const { data } = query;
-      await model.bulkCreate(data);
+      response = await model.bulkCreate(data);
       logger.info(`Inserted data into ${table}`);
       break;
     }
 
     case 'update': {
       const { data } = query;
-      await updateMany(model, data)
+      response = await updateMany(model, data)
       logger.info(`Updated data in ${table}`);
       break;
     }
 
     case 'delete': {
       const { data } = query;
-      await deleteMany(model, data)
+      response = await deleteMany(model, data)
       logger.info(`Deleted data from ${table}`);
       break;
     }
@@ -61,6 +61,7 @@ export async function writeDatabase(query: Query): Promise<void> {
     default:
       throw new Failure(400, "Query type doesn't exist", { "type": "Query type doesn't exist" });
   }
+  return response
 }
 // Helper function to get the model by table name
 function getModel(table: string): ModelStatic<Model> {
