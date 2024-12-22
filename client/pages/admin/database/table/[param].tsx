@@ -1,66 +1,116 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import DataTable from '../../../../components/DataTable/DataTable'
+import RawDataTable from '../../../../components/DataTable/RawDataTable'
+import RawDataTableNewButton from '../../../../components/DataTable/RawDataTableNewButton'
 import { table } from 'console';
 
-const AdminParamPage = () => {
+function RawDataTablePage() {
     const { query } = useRouter();
-    const [data, setData] = useState<any>(null);
-  
-    const handleDelete = async (id: string) => {
-        const request = {
-            type: "delete",
-            table: query.param,
-            data: [{id}]
-        }
-        const response = await fetch("http://localhost:3001/database/write", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(request), // Send the id to delete
-          });
-          console.log(response)
-        // Create a deep copy of the alteredData object to avoid mutating the original
-        const newData = JSON.parse(JSON.stringify(data)); // or use cloneDeep if using lodash
-      
-        // Remove the data entry where id matches the provided id
-        newData.table.data = newData.table.data.filter((row: any) => row.id !== id);
-      
-        // Now you can set the state with the new modified data
-        setData(newData);
-      };
+    //TODO define a type for that!
+    const [data, setData] = useState<{ columns: any[]; data: any[] } | null>(null);
+
+    // const handleDelete = async (id: string) => {
+    //     const request = {
+    //         type: "delete",
+    //         table: query.param,
+    //         data: [{id}]
+    //     }
+    //     const response = await fetch("http://localhost:3001/database/write", {
+    //         method: "POST",
+    //         headers: {
+    //           "Content-Type": "application/json",
+    //         },
+    //         body: JSON.stringify(request),
+    //       });
+    //       console.log(response)
+    //     const newData = JSON.parse(JSON.stringify(data));
+    //     newData.table.data = newData.table.data.filter((row: any) => row.id !== id);
+    //     setData(newData);
+    //   };
 
     useEffect(() => {
-        console.log('query.param:', query.param);  // Check if param is available
-        if (query.param) {
-            fetch(`http://localhost:3001/database/read/${query.param}`)
-                .then((res) => {
-                    console.log('Response status:', res.status);  // Check HTTP status
-                    console.log(typeof res);
-                    return res.json();
-                })
-                .then(result => {
-                    console.log('Fetched data:', result);  // Check fetched data
-                    setData(result.data)
-                })
-                .catch((err) => {
-                    console.error('Fetch error:', err);
-                });
+        const UserDataMockUp = {
+            "status": "success",
+            "data": {
+                "tableName": "User",
+                "columns": [
+                    {
+                        "name": "id",
+                        "type": "UUID"
+                    },
+                    {
+                        "name": "email",
+                        "type": "CHARACTER VARYING(255)"
+                    },
+                    {
+                        "name": "pass",
+                        "type": "CHARACTER VARYING(255)"
+                    },
+                    {
+                        "name": "createdAt",
+                        "type": "TIMESTAMP WITH TIME ZONE"
+                    },
+                    {
+                        "name": "updatedAt",
+                        "type": "TIMESTAMP WITH TIME ZONE"
+                    }
+                ],
+                "data": [
+                    {
+                        "id": "dbbe6c2b-d4ac-4dcc-894b-978a9595d011",
+                        "email": "test@gmail.com",
+                        "pass": "$2b$10$R45iuwrSbb.zHXtX4wBIAu99KUmOir6RckKTiGDbJREzUANDiImAi",
+                        "createdAt": "2024-12-22T00:38:08.417Z",
+                        "updatedAt": "2024-12-22T00:38:08.417Z"
+                    }
+                ]
+            }
         }
+        setData(UserDataMockUp.data)
     }, [query.param]);
 
-    useEffect(() => {
-        console.log('Updated data:', typeof data); // Logs data after state update
-        setData(data)
-    }, [data]);
+    const handleDelete = async (id: string) => {
+        const newData = JSON.parse(JSON.stringify(data));
+        newData.data = newData.data.filter((row: any) => row.id !== id);
+        setData(newData);
+    };
+    const handleNew = async () => {
+        const newData = JSON.parse(JSON.stringify(data));
+        const newMockUpUser =             {
+            "id": "dbbe6c2b-d4ac-4dcc-894b-978a9595d012",
+            "email": "new@gmail.com",
+            "pass": "$2b$10$R45iuwrSbb.zHXtX4wBIAu99KUmOir6RckKTiGDbJREzUANDiImAi",
+            "createdAt": "2024-12-22T00:38:08.417Z",
+            "updatedAt": "2024-12-22T00:38:08.417Z"
+        }
+        newData.data.push(newMockUpUser)
+        setData(newData);
+    };
+
+    // useEffect(() => {
+    //     console.log('query.param:', query.param);  // Check if param is available
+    //     if (query.param) {
+    //         fetch(`http://localhost:3001/database/read/${query.param}`)
+    //             .then((res) => {
+    //                 return res.json();
+    //             })
+    //             .then(result => {
+    //                 console.log('Fetched data:', result);
+    //                 setData(result.data)
+    //             })
+    //             .catch((err) => {
+    //                 console.error('Fetch error:', err);
+    //             });
+    //     }
+    // }, [query.param]);
 
     return (
         <div>
-            <h1>Parameter: {query.param}</h1>
-            {data ? <DataTable data={data} handleDelete={handleDelete} /> : <p>No data available</p>}
+            <h1>{query.param}</h1>
+            <RawDataTableNewButton handleNew={handleNew}/>
+            {data ? <RawDataTable data={data} handleDelete={handleDelete} /> : <p>Loading...</p>}
         </div>
     );
 };
 
-export default AdminParamPage;
+export default RawDataTablePage;
