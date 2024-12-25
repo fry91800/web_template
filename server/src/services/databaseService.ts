@@ -31,37 +31,53 @@ export async function getTableInfo(tableName: string) {
   return tableInfo;
 }
 
-
-export async function writeDatabase(query: Query): Promise<any>{
-  const { type, table } = query;
+export async function insert(query: Query): Promise<any> {
+  const { data, table } = query;
   const model = getModel(table);
-  let response = null;
-  switch (type) {
-    case 'insert': {
-      const { data } = query;
-      response = await model.bulkCreate(data);
-      logger.info(`Inserted data into ${table}`);
-      break;
+  const response = await model.create(data);
+  logger.info(`Inserted data into ${table}`);
+  return response.dataValues;
+}
+export async function insertMany(query: Query): Promise<any> {
+  const { data, table } = query;
+  const model = getModel(table);
+    logger.info(`Inserted data into ${table}`);
+    //console.log(inserted)
+    const res = []
+    for (const object of data)
+    {
+     try{
+      const newRecord = await model.create(object)
+      res.push(newRecord.dataValues)
+     }
+     catch{}
     }
-
-    case 'update': {
-      const { data } = query;
-      response = await updateMany(model, data)
-      logger.info(`Updated data in ${table}`);
-      break;
-    }
-
-    case 'delete': {
-      const { data } = query;
-      response = await deleteMany(model, data)
-      logger.info(`Deleted data from ${table}`);
-      break;
-    }
-
-    default:
-      throw new Failure(400, "Query type doesn't exist", { "type": "Query type doesn't exist" });
+    console.log(res)
+    return res;
   }
-  return response
+export async function update(query: Query): Promise<any> {
+  const { data, table } = query;
+  const model = getModel(table);
+  console.log(JSON.stringify(query.data))
+  const record = await model.findOne({ where: data.where });
+  if (!record) {
+    throw new Failure(400, "Record does not exist", { "record": "Record does not exist" });
+  }
+  await record.update(data.update);
+  logger.info(`Updated data in ${table}`);
+  return record.dataValues;
+}
+export async function remove(query: Query): Promise<any> {
+  const { data, table } = query;
+  const model = getModel(table);
+  console.log(JSON.stringify(query.data))
+  const record = await model.findOne({ where: data.where });
+  if (!record) {
+    throw new Failure(400, "Record does not exist", { "record": "Record does not exist" });
+  }
+  await record.destroy();
+  logger.info(`Deleted data from ${table}`);
+  return record.dataValues;
 }
 // Helper function to get the model by table name
 function getModel(table: string): ModelStatic<Model> {
@@ -110,8 +126,7 @@ function csvToJson<T extends Record<string, any>>(csv: string, delimiter: string
   return json;
 }
 
-export function fileToQueryData(type: queryString, file: Express.Multer.File | undefined)
-{
+export function fileToQueryData(type: queryString, file: Express.Multer.File | undefined) {
   if (!file) {
     throw new Failure(400, 'No file uploaded', { "file": "No file uploaded" });
   }
@@ -144,44 +159,4 @@ export function fileToQueryData(type: queryString, file: Express.Multer.File | u
       throw new Failure(400, "Query type doesn't exist", { "type": "Query type doesn't exist" });
   }
   return jsonData
-}
-// Write to the database from a file
-export async function writeFromFile(type: queryString, file: Express.Multer.File | undefined) {
-  if (!file) {
-    throw new Failure(400, 'No file uploaded', { "file": "No file uploaded" });
-  }
-  const fileString = fs.readFileSync(file.path, 'utf-8');
-  var jsonData = csvToJson(fileString);
-  const table = "User";
-  const model = getModel(table);
-  switch (type) {
-    case 'insert': {
-      await model.bulkCreate(jsonData);
-      logger.info(`Inserted data into ${table}`);
-      break;
-    }
-
-    case 'update': {
-      jsonData = jsonData.map(item => ({
-        where: { id: item.id },
-        update: { email: item.email, pass: item.pass },
-      }));
-      await updateMany(model, jsonData)
-      logger.info(`Updated data in ${table}`);
-      break;
-    }
-
-    case 'delete': {
-      jsonData = jsonData.map(item => ({
-        where: { id: item.id }
-      }));
-      await deleteMany(model, jsonData)
-      logger.info(`Deleted data from ${table}`);
-      break;
-    }
-
-    default:
-      throw new Failure(400, "Query type doesn't exist", { "type": "Query type doesn't exist" });
-  }
-  return
 }

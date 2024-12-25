@@ -42,12 +42,12 @@ app.use('/protecc', protectedRouter);
 
 // Error-Handling Middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  logger.error(err);
   if (err.status === 'fail')
   {
     const jSendResponse = {status: err.status, data: err.data}
     return res.status(err.statusCode).json(jSendResponse);
   }
-  logger.error(err);
 
   // Determine status code and error message
   const statusCode = err.statusCode || err.status || 500;

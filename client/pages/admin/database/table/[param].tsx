@@ -9,116 +9,124 @@ function RawDataTablePage() {
     const { query } = useRouter();
     //TODO define a type for that!
     const [data, setData] = useState<{ columns: any[]; data: any[] } | null>(null);
+    const [file, setFile] = useState(null);
 
-    // const handleDelete = async (id: string) => {
-    //     const request = {
-    //         type: "delete",
-    //         table: query.param,
-    //         data: [{id}]
-    //     }
-    //     const response = await fetch("http://localhost:3001/database/write", {
-    //         method: "POST",
-    //         headers: {
-    //           "Content-Type": "application/json",
-    //         },
-    //         body: JSON.stringify(request),
-    //       });
-    //       console.log(response)
-    //     const newData = JSON.parse(JSON.stringify(data));
-    //     newData.table.data = newData.table.data.filter((row: any) => row.id !== id);
-    //     setData(newData);
-    //   };
+    const handleFileChange = (e: any) => {
+        setFile(e.target.files[0]);
+    };
 
-    useEffect(() => {
-        const UserDataMockUp = {
-            "status": "success",
-            "data": {
-                "tableName": "User",
-                "columns": [
-                    {
-                        "name": "id",
-                        "type": "UUID"
-                    },
-                    {
-                        "name": "email",
-                        "type": "CHARACTER VARYING(255)"
-                    },
-                    {
-                        "name": "pass",
-                        "type": "CHARACTER VARYING(255)"
-                    },
-                    {
-                        "name": "createdAt",
-                        "type": "TIMESTAMP WITH TIME ZONE"
-                    },
-                    {
-                        "name": "updatedAt",
-                        "type": "TIMESTAMP WITH TIME ZONE"
-                    }
-                ],
-                "data": [
-                    {
-                        "id": "dbbe6c2b-d4ac-4dcc-894b-978a9595d011",
-                        "email": "test@gmail.com",
-                        "pass": "$2b$10$R45iuwrSbb.zHXtX4wBIAu99KUmOir6RckKTiGDbJREzUANDiImAi",
-                        "createdAt": "2024-12-22T00:38:08.417Z",
-                        "updatedAt": "2024-12-22T00:38:08.417Z"
-                    }
-                ]
-            }
+    const handleSubmit = async (e: any) => {
+        e.preventDefault();
+        if (!file) {
+            alert('Please select a file first!');
+            return;
         }
-        setData(UserDataMockUp.data)
-    }, [query.param]);
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('type', "insert");
+        formData.append('table', "User");
+        const response = await fetch('http://localhost:3001/database/upload', {
+            method: 'POST',
+            body: formData,
+        });
 
-    const handleDelete = async (id: string) => {
+        const responseJson = await response.json();
+        if (responseJson.status !== "success") {
+            return
+        }
+        const responseData = responseJson.data
+        console.log(responseJson)
         const newData = JSON.parse(JSON.stringify(data));
-        newData.data = newData.data.filter((row: any) => row.id !== id);
+        newData.data = newData.data.concat(responseData)
         setData(newData);
     };
-    const handleInsert = async (object: any[]) => {
-        const request = {
-            type: "insert",
-            table: query.param,
-            data: [object]
-        }
-        const response = await fetch("http://localhost:3001/database/write", {
+
+    const handleInsert = async (object: any) => {
+        const response = await fetch(`http://localhost:3001/database/table/${query.param}`, {
             method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(object),
+        });
+        const responseJson = await response.json();
+        if (responseJson.status !== "success") {
+            return
+        }
+        const newObject = responseJson.data
+        console.log(newObject)
+        const newData = JSON.parse(JSON.stringify(data));
+        newData.data.push(newObject)
+        setData(newData);
+    };
+
+    const handleUpdate = async (update: any) => {
+        const response = await fetch(`http://localhost:3001/database/table/${query.param}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(update),
+        });
+        const responseJson = await response.json();
+        if (responseJson.status !== "success") {
+            return false
+        }
+        console.log(responseJson)
+        return responseJson.data
+    };
+
+
+    const handleDelete = async (id: string) => {
+        console.log(id)
+        const request = {
+            type: "delete",
+            table: query.param,
+            data: { where: { id } }
+        }
+        const response = await fetch(`http://localhost:3001/database/table/${query.param}`, {
+            method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(request),
         });
         const responseJson = await response.json();
+        console.log(responseJson)
         if (responseJson.status !== "success") {
             return
         }
-        const newObject = responseJson.data[0]
         const newData = JSON.parse(JSON.stringify(data));
-        newData.data.push(newObject)
+        newData.data = newData.data.filter((row: any) => row.id !== id);
+        console.log(newData)
         setData(newData);
     };
 
-    // useEffect(() => {
-    //     console.log('query.param:', query.param);  // Check if param is available
-    //     if (query.param) {
-    //         fetch(`http://localhost:3001/database/read/${query.param}`)
-    //             .then((res) => {
-    //                 return res.json();
-    //             })
-    //             .then(result => {
-    //                 console.log('Fetched data:', result);
-    //                 setData(result.data)
-    //             })
-    //             .catch((err) => {
-    //                 console.error('Fetch error:', err);
-    //             });
-    //     }
-    // }, [query.param]);
+    useEffect(() => {
+        console.log('query.param:', query.param);  // Check if param is available
+        if (query.param) {
+            fetch(`http://localhost:3001/database/table/${query.param}`)
+                .then((res) => {
+                    return res.json();
+                })
+                .then(result => {
+                    console.log('Fetched data:', result);
+                    setData(result.data)
+                })
+                .catch((err) => {
+                    console.error('Fetch error:', err);
+                });
+        }
+    }, [query.param]);
 
     return (
         <div>
+            <form onSubmit={handleSubmit}>
+                <input type="file" onChange={handleFileChange} />
+                <button type="submit">Upload</button>
+            </form>
             <h1>{query.param}</h1>
-            {data ? <RawDataTable data={data} handleDelete={handleDelete} /> : <p>Loading...</p>}
+            {data ? <RawDataTable data={data} handleDelete={handleDelete} handleUpdate={handleUpdate} /> : <p>Loading...</p>}
             {data && query.param ? <RawDataTableForm handleInsert={handleInsert} fields={data.columns} table={query.param} /> : <p>Loading...</p>}
         </div>
     );

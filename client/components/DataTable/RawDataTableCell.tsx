@@ -2,28 +2,43 @@ import React, { useState, useEffect } from "react";
 import styles from "./RawDataTable.module.css";
 import RawDataTableDeleteButton from "../DataTable/RawDataTableDeleteButton";
 
-interface RawDataTableHeaderProps {
+interface RawDataTableCellProps {
   content: string| null;
+  handleUpdate: (update: any) => any;
+  id: string
+  field: string
 }
-const RawDataTableHeader: React.FC<RawDataTableHeaderProps> = ({content}) => {
+const RawDataTableHeader: React.FC<RawDataTableCellProps> = ({content, handleUpdate, id, field}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(String(content));
   const [inputValue, setInputValue] = useState(String(content));
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      handleSubmit();
+      await handleSubmit();
+      setIsEditing(false)
     }
   };
 
   const handleClick = () => {
+    setInputValue(value)
     setIsEditing(true)
   };
-  const handleSubmit = () => {
-    console.log("Submitted value:", value);
-    // Add your custom logic here
-    setValue(inputValue);
-    setIsEditing(false)
+  const handleSubmit = async () => {
+    if (inputValue === value)
+    {
+      return
+    }
+    console.log("Submitted value:", inputValue);
+    const updateData: any = {};
+    updateData[field] = inputValue
+    const update: any = {update: updateData, where: {id}};
+    const updateResponse = await handleUpdate(update)
+    if (updateResponse !== false)
+    {
+      console.log(updateResponse)
+      setValue(updateResponse[field]);
+    }
   };
   return (
     <div>

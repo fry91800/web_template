@@ -34,7 +34,7 @@ const RawDataTableForm: React.FC<RawDataTableFormProps> = ({ fields, table, hand
     return (
         <div>
         {fields?.map((field: any) => (
-            <input type="text" className="rawDataInput" name={field.name} placeholder={field.name} required/>
+            <input key={field.name+"-input"} type="text" className="rawDataInput" name={field.name} placeholder={field.name} required/>
           ))}
           <button onClick={handleSubmit} >submit</button>
           </div>
