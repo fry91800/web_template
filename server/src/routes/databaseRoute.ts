@@ -5,10 +5,11 @@ import sequelize from '../database/database';
 import logger from '../config/logger';
 import * as databaseService from '../services/databaseService';
 import upload from '../config/multer';
+import checkRoles from '../middleware/roleMiddleware';
 const router = Router();
 
 // Get all database info
-router.get('/', async (req: express.Request, res: express.Response, next) => {
+router.get('/', checkRoles(['admin']), async (req: express.Request, res: express.Response, next) => {
   try {
     const databaseInfo: Database = await databaseService.getDatabaseInfo();
     const responseData = {
@@ -26,7 +27,7 @@ router.get('/', async (req: express.Request, res: express.Response, next) => {
   }
 });
 
-router.get('/table/:table', async (req: express.Request, res: express.Response, next) => {
+router.get('/table/:table', checkRoles(['admin']), async (req: express.Request, res: express.Response, next) => {
   try {
     const tableInfo: TableInfo = await databaseService.getTableInfo(req.params.table);
     const response: JSendResponse = {

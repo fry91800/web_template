@@ -20,17 +20,32 @@ const app: Application = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+// Log cookies immediately after cookie-parser
+app.use((req, res, next) => {
+  console.log("Cookies after cookie-parser:", req.cookies);
+  next();
+});
 app.use(cors({
   origin: 'http://localhost:3000', // Allow requests from this origin
   credentials: true, // Allow credentials (cookies)
 }));
 
+app.use((req, res, next) => {
+  console.log("Cookies after cookie-parser:", req.cookies);
+  next();
+});
 // Request Logger Middleware
 app.use(requestLogger);
-
+app.use((req, res, next) => {
+  console.log("Cookies after cookie-parser:", req.cookies);
+  next();
+});
 // Auth Middleware
 app.use(authenticate);
-
+app.use((req, res, next) => {
+  console.log("Cookies after cookie-parser:", req.cookies);
+  next();
+});
 
 // Root Endpoint
 app.get('/', async (req: Request, res: Response) => {

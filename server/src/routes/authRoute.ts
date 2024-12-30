@@ -31,7 +31,7 @@ router.post('/login', validateRequest(loginSchema), async (req: Request, res: Re
     res.cookie('access_token', accessToken, {
       httpOnly: true, // Prevent access via JavaScript
       secure: process.env.NODE_ENV === 'prod', // Ensure HTTPS in production
-      sameSite: 'strict', // Prevent cross-site requests
+      sameSite: 'lax', // Prevent cross-site requests
       maxAge: accessTokenMaxAge, // Token expiration in milliseconds (1 hour)
     });
     // Set the refresh token
@@ -39,7 +39,7 @@ router.post('/login', validateRequest(loginSchema), async (req: Request, res: Re
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true, // Prevent access via JavaScript
       secure: process.env.NODE_ENV === 'prod', // Ensure HTTPS in production
-      sameSite: 'strict', // Prevent cross-site requests
+      sameSite: 'lax', // Prevent cross-site requests
       maxAge: 2592000000 // Refresh token expires in 30 days
     });
     logger.info("Log in: OK")

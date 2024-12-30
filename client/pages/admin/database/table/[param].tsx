@@ -105,13 +105,19 @@ function RawDataTablePage() {
     useEffect(() => {
         console.log('query.param:', query.param);  // Check if param is available
         if (query.param) {
-            fetch(`http://localhost:3001/database/table/${query.param}`)
+            fetch(`http://localhost:3001/database/table/${query.param}`,
+                {
+                    credentials: 'include',
+                }
+            )
                 .then((res) => {
                     return res.json();
                 })
                 .then(result => {
-                    console.log('Fetched data:', result);
-                    setData(result.data)
+                    if (result.status === "success") {
+                        console.log('Fetched data:', result);
+                        setData(result.data)
+                    }
                 })
                 .catch((err) => {
                     console.error('Fetch error:', err);

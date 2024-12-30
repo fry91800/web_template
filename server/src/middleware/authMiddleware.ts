@@ -7,6 +7,8 @@ import logger from '../config/logger';
 // Authentication middleware
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
   try {
+    logger.info("cookies: "+ JSON.stringify(req.cookies))
+    console.log('Request Headers:', req.headers);
     // Check and validate access token
     let accessToken = req.cookies.access_token;
     if (accessToken) {
@@ -30,7 +32,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
         res.cookie('access_token', accessToken, {
           httpOnly: true, // Prevent access via JavaScript
           secure: process.env.NODE_ENV === 'prod', // Ensure HTTPS in production
-          sameSite: 'strict', // Prevent cross-site requests
+          sameSite: 'lax', // Prevent cross-site requests
           maxAge: 3600000, // Token expiration in milliseconds (1 hour)
         });
         const accessDecoded = verifyAccessToken(accessToken);
