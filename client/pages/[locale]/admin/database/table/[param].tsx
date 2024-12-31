@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import RawDataTable from '../../../../components/DataTable/RawDataTable'
-import RawDataTableNewButton from '../../../../components/DataTable/RawDataTableNewButton'
-import RawDataTableForm from '../../../../components/DataTable/RawDataTableForm'
+import RawDataTable from '../../../../../components/DataTable/RawDataTable'
+import RawDataTableNewButton from '../../../../../components/DataTable/RawDataTableNewButton'
+import RawDataTableForm from '../../../../../components/DataTable/RawDataTableForm'
 import { table } from 'console';
 
 function RawDataTablePage() {
