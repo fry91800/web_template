@@ -16,20 +16,20 @@ Core Backend features:
 -Auth: OK
 -DB View: OK
 -DB Modification: OK
--DB File Load
+-DB File Load: OK
 -DB File dump
--Email Service
 -Internationalization
+-Email Service
 
 Core Backend processing:
 -Input Validation: OK
--Roles and permissions (RBAC)
+-Roles and permissions (RBAC): OK
 -Rate limitting
--User actions logging (single table)
+-User actions logging
 
 
 Core Frontend features:
--Fetch from Backend
+-Fetch from Backend: OK
 -Mobile compatible
 -Light & Dark mode
 
@@ -37,3 +37,16 @@ Core Frontend features:
 Core fullstack features:
 -Search filter sort pagination
 -File Dump/Load from app
+
+TODO:
+Rate limitting: OK
+Internationalization
+User actions logging
+Analytics (storing only)
+Harmonization
+    -Types
+    -logging
+    -Tests
+    -Code refactor
+    -Security
+    -Parameters from env

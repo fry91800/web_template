@@ -7,7 +7,7 @@ import logger from './config/logger';
 import { requestLogger } from './middleware/requestMiddleware';
 import { authenticate } from './middleware/authMiddleware';
 import sequelize from './database/database';
-import { User } from './database/models/User';
+import rateLimit from './middleware/rateLimitMiddleware';
 import cors from 'cors';
 
 // Routes
@@ -17,6 +17,17 @@ import protectedRouter from './routes/protectedRoute';
 
 const app: Application = express();
 
+/* This is to retrieve the ip if behind a proxy, apparently, using
+app.set("trust proxy", "loopback"); // Only trusts localhost
+app.set("trust proxy", "192.168.0.1"); // Trusts a specific IP
+might be better in a real scenario for security, this deserve some
+research when needed
+*/
+if (process.env.NODE_ENV === 'production') {
+  app.set("trust proxy", true);
+}
+
+app.use(rateLimit({ windowMs: 60000, maxRequests: 10 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
