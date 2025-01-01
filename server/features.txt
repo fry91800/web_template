@@ -40,7 +40,7 @@ Core fullstack features:
 
 TODO:
 Rate limitting: OK
-Internationalization
+Internationalization: Front
 User actions logging
 Analytics (storing only)
 Harmonization

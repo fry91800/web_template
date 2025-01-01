@@ -7,8 +7,6 @@ import logger from '../config/logger';
 // Authentication middleware
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
   try {
-    logger.info("cookies: "+ JSON.stringify(req.cookies))
-    console.log('Request Headers:', req.headers);
     // Check and validate access token
     let accessToken = req.cookies.access_token;
     if (accessToken) {
